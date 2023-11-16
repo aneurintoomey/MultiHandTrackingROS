@@ -1,0 +1,6 @@
+{
+	"name": "ROS Melodic",
+	"build": {
+		"dockerfile": "Dockerfile"
+	}
+}

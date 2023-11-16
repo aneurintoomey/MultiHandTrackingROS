@@ -2,16 +2,17 @@
 
 from __future__ import print_function
 
-from joint_tracking.srv import mediapipeTracker,mediapipeTrackerResponse
+from joint_tracking.srv import MediapipeTracker, MediapipeTrackerResponse
 from joint_tracking.msg import Hand
-from cv_bridge import CvBridge
+import cv2
 import rospy
 
+import ros_numpy
 import mediapipe as mp
 import numpy
 
 def processLandmarks(hand_landmarker_result):
-    retval = mediapipeTrackerResponse()
+    retval = MediapipeTrackerResponse()
 
     retval.left = Hand()
     retval.right = Hand()
@@ -37,36 +38,39 @@ def processLandmarks(hand_landmarker_result):
             retval.left.v = tuple(v)
             retval.left.z = tuple(z)
 
+            rospy.loginfo(tuple(u).size)
+
         elif(handedness[0] == "Right"):
             retval.right.u = tuple(u)
             retval.right.v = tuple(v)
             retval.right.z = tuple(z)
-    
+
+    rospy.loginfo("Service Responded")
     return retval
 
 def handleService(req):
+    rospy.loginfo("Service Requested")
+
     BaseOptions = mp.tasks.BaseOptions
     HandLandmarker = mp.tasks.vision.HandLandmarker
     HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
     VisionRunningMode = mp.tasks.vision.RunningMode
 
     options = HandLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path='scripts/hand_landmarker.task'),
+        base_options=BaseOptions(model_asset_path='/workspaces/MultiHandTrackingROS/src/joint_tracking/scripts/hand_landmarker.task'),
         running_mode=VisionRunningMode.IMAGE,
         num_hands=2)
     
-    bridge = CvBridge()
-    cv_image = bridge.imgmsg_to_cv2(req.image, desired_encoding='passthrough')
-    
-    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=numpy.asarray(cv_image))
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=ros_numpy.numpify(req.image))
 
     landmarker = HandLandmarker.create_from_options(options)
 
     return processLandmarks(landmarker.detect(mp_image))
 
 def startServer():
-    rospy.init_node('mediapipeTrackerServer')
-    s = rospy.Service('mediapipeTracker', mediapipeTracker, handleService)
+    rospy.init_node('MediapipeTrackerServer')
+    s = rospy.Service('MediapipeTracker', MediapipeTracker, handleService)
+    rospy.loginfo("Hand Tracker Service Started")
     rospy.spin()
 
 if __name__ == "__main__":
