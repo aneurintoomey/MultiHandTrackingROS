@@ -30,13 +30,11 @@ HandTracking::HandTracking(): nh("~"){
 
     srv.request.image = *out_msg.toImageMsg();
 
-    while(true){
+    while(ros::ok()){
         if(client.call(srv)){
             ROS_INFO("Service Succesfully Called");
-            ROS_INFO("Left: [%s]", srv.response.left.type.c_str());
-            ROS_INFO("Left: [%f]", srv.response.left.u.size());
-            ROS_INFO("Left: [%f]", srv.response.left.v.size());
-            ROS_INFO("Left: [%f]", srv.response.left.z.size());
+            ROS_INFO("Right: [%s]", srv.response.right.type.c_str());
+            ROS_INFO("Right: [%d]", srv.response.right.u.size());
         } else {
             ROS_ERROR("Failed to Call Service");
         }
