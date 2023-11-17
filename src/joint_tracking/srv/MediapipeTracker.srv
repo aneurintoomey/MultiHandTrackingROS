@@ -2,4 +2,3 @@ sensor_msgs/Image image
 ---
 Hand left
 Hand right
-sensor_msgs/Image newImage

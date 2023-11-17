@@ -9,6 +9,9 @@ import rospy
 import ros_numpy
 
 import mediapipe as mp
+from mediapipe import solutions
+from mediapipe.framework.formats import landmark_pb2
+
 import numpy
 import os
 
@@ -28,7 +31,7 @@ def handleService(req):
         running_mode=VisionRunningMode.IMAGE,
         num_hands=2)
 
-    #Reverse from BGR format to RGB
+    #Reverse image format from BGR format to RGB and load it
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(ros_numpy.numpify(req.image), cv2.COLOR_BGR2RGB))
 
     landmarker = HandLandmarker.create_from_options(options)
@@ -44,6 +47,8 @@ def handleService(req):
     for index in range(len(hand_landmarker_result.hand_landmarks)):
         hand_landmarks = hand_landmarker_result.hand_landmarks[index]
         handedness = hand_landmarker_result.handedness[index]
+
+        hand_landmarker_result.handedness[index] += str(index)
 
         u = list()
         v = list()
@@ -71,6 +76,44 @@ def handleService(req):
     rospy.loginfo("Service Responded")
 
     return retval
+
+
+#draw_landmarks sourced from mediapipe documentation
+def draw_landmarks_on_image(rgb_image, detection_result):
+  hand_landmarks_list = detection_result.hand_landmarks
+  handedness_list = detection_result.handedness
+  annotated_image = numpy.copy(rgb_image)
+
+  # Loop through the detected hands to visualize.
+  for idx in range(len(hand_landmarks_list)):
+    hand_landmarks = hand_landmarks_list[idx]
+    handedness = handedness_list[idx]
+
+    # Draw the hand landmarks.
+    hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+    hand_landmarks_proto.landmark.extend([
+      landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks
+    ])
+    solutions.drawing_utils.draw_landmarks(
+      annotated_image,
+      hand_landmarks_proto,
+      solutions.hands.HAND_CONNECTIONS,
+      solutions.drawing_styles.get_default_hand_landmarks_style(),
+      solutions.drawing_styles.get_default_hand_connections_style())
+
+    # Get the top left corner of the detected hand's bounding box.
+    height, width, _ = annotated_image.shape
+    x_coordinates = [landmark.x for landmark in hand_landmarks]
+    y_coordinates = [landmark.y for landmark in hand_landmarks]
+    text_x = int(min(x_coordinates) * width)
+    text_y = int(min(y_coordinates) * height) - 10
+
+    # Draw handedness (left or right hand) on the image.
+    cv2.putText(annotated_image, f"{handedness[0].category_name}",
+                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
+                1, (88, 205, 54), 1, cv2.LINE_AA)
+
+  cv2_imshow(annotated_image)
 
 if __name__ == "__main__":
     rospy.init_node('MediapipeTrackerServer')
