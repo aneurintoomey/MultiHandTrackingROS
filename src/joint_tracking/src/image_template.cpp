@@ -25,7 +25,7 @@ HandTracking::HandTracking(): nh("~"){
     //Testing code follows
     joint_tracking::MediapipeTracker srv;
     cv_bridge::CvImage out_msg;
-    out_msg.image = cv::imread("/workspaces/MultiHandTrackingROS/640px-Human-Hands-Front-Back.jpg");
+    out_msg.image = cv::imread("/workspaces/multi_hand_tracking_ws/640px-Human-Hands-Front-Back.jpg");
     out_msg.encoding = "bgr8";
 
     srv.request.image = *out_msg.toImageMsg();
@@ -33,8 +33,7 @@ HandTracking::HandTracking(): nh("~"){
     while(ros::ok()){
         if(client.call(srv)){
             ROS_INFO("Service Succesfully Called");
-            ROS_INFO("Right: [%s]", srv.response.right.type.c_str());
-            ROS_INFO("Right: [%d]", srv.response.right.u.size());
+            ROS_INFO("Right Hand is a [%s] hand", srv.response.right.type.c_str());
         } else {
             ROS_ERROR("Failed to Call Service");
         }
@@ -45,9 +44,11 @@ HandTracking::HandTracking(): nh("~"){
 }
 
 int main(int argc, char **argv){
-    ros::init(argc, argv, "joint_tracking");
+    ros::init(argc, argv, "image_template");
     HandTracking ht;
-    ros::spin();
+
+    ros::AsyncSpinner spinner(4);
+    spinner.start();
 
     return 0;
 }

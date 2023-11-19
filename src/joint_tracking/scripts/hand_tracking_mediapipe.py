@@ -2,8 +2,6 @@
 
 from __future__ import print_function
 
-from joint_tracking.srv import MediapipeTracker, MediapipeTrackerResponse
-from joint_tracking.msg import Hand
 import cv2
 import rospy
 import ros_numpy
@@ -14,6 +12,9 @@ from mediapipe.framework.formats import landmark_pb2
 
 import numpy
 import os
+
+from joint_tracking.srv import MediapipeTracker, MediapipeTrackerResponse
+from joint_tracking.msg import Hand
 
 def handleService(req):
     rospy.loginfo("Service Requested")
@@ -112,8 +113,6 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     cv2.putText(annotated_image, f"{handedness[0].category_name}",
                 (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
                 1, (88, 205, 54), 1, cv2.LINE_AA)
-
-  cv2_imshow(annotated_image)
 
 if __name__ == "__main__":
     rospy.init_node('MediapipeTrackerServer')
