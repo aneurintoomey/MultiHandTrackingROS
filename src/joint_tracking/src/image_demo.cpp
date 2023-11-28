@@ -34,12 +34,9 @@ int main(int argc, char **argv){
     ros::AsyncSpinner spinner(4);
     spinner.start();
 
-    ros::Rate looprate(20);
-    while(ros::ok()){
+    while(nh.ok()){
         cv::imshow("Live Image", cv::imread("frame.jpg"));
         cv::waitKey(1);
-
-        looprate.sleep();
     }
 
     cv::destroyAllWindows();
