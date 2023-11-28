@@ -5,6 +5,7 @@ from __future__ import print_function
 import cv2
 import rospy
 import ros_numpy
+import sensor_msgs.msg as sensor_msgs
 
 import mediapipe as mp
 from mediapipe import solutions
@@ -45,6 +46,8 @@ def handleService(req):
     retval.left.type = "Left"
     retval.right.type = "Right"
 
+    retval.newImage = draw_landmarks_on_image(ros_numpy.numpify(req.image), hand_landmarker_result)
+
     for index in range(len(hand_landmarker_result.hand_landmarks)):
         hand_landmarks = hand_landmarker_result.hand_landmarks[index]
         handedness = hand_landmarker_result.handedness[index]
@@ -80,7 +83,7 @@ def handleService(req):
 
 
 #draw_landmarks sourced from mediapipe documentation
-def draw_landmarks_on_image(rgb_image, detection_result):
+def draw_landmarks_on_image(rgb_image: numpy.array, detection_result):
   hand_landmarks_list = detection_result.hand_landmarks
   handedness_list = detection_result.handedness
   annotated_image = numpy.copy(rgb_image)
@@ -110,9 +113,10 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     text_y = int(min(y_coordinates) * height) - 10
 
     # Draw handedness (left or right hand) on the image.
-    cv2.putText(annotated_image, f"{handedness[0].category_name}",
-                (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
-                1, (88, 205, 54), 1, cv2.LINE_AA)
+    cv2.putText(annotated_image, f"{handedness[0].category_name}", (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX, 1, (88, 205, 54), 1, cv2.LINE_AA)
+    
+  cv2.imwrite("Tracked_Hands.jpg", annotated_image)
+  return ros_numpy.msgify(sensor_msgs.Image, annotated_image, "rgb8")
 
 if __name__ == "__main__":
     rospy.init_node('MediapipeTrackerServer')
