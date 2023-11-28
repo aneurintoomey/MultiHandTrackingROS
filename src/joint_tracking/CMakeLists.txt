@@ -139,6 +139,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/joint_tracking_node.cpp)
 add_executable(image_template src/image_template.cpp)
+add_executable(image_demo src/image_demo.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -150,12 +151,14 @@ add_executable(image_template src/image_template.cpp)
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(image_template ${catkin_EXPORTED_TARGETS})
+add_dependencies(image_demo ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(image_template ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(image_demo ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##
