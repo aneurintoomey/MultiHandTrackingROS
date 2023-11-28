@@ -39,7 +39,7 @@ int main(int argc, char **argv){
         cv::imshow("Live Image", cv::imread("frame.jpg"));
         cv::waitKey(1);
         } catch (){
-            ROS_ERROR("Failed to display image")
+            ROS_ERROR("Failed to display image");
         }
     }
 
