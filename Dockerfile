@@ -5,6 +5,9 @@
 # generated from docker_images/create_ros_image.Dockerfile.em
 FROM ros:melodic-ros-core-bionic
 
+# Use updated ROS key (expires June 2025)
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4B63CF8FDE49746E98FA01DDAD19BAB3CBF125EA
+
 # install bootstrap tools
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
@@ -23,13 +26,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 #Add automatic setup sourcing to bash
-RUN touch /root/.bashrc && echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /root/.bashrc
+RUN touch /root/.bashrc && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc
 
-#Install dependencies
-RUN sudo apt update && sudo apt install -y libopencv-dev ros-${ROS_DISTRO}-cv-bridge python3-pip
-
-#Upgrade python (ROS melodic uses 2.7 we have to use at least 3.8 for our service)
-RUN sudo apt install -y python3.8
+#Install dependencies and upgrade python (ROS melodic uses 2.7 we have to use at least 3.8 for our service)
+RUN apt-get update && apt-get install -y libopencv-dev ros-${ROS_DISTRO}-cv-bridge python3-pip python3.8
 
 #Install dependencies
 RUN python3.8 -m pip install --upgrade pip
@@ -45,3 +45,4 @@ RUN rosdep install --from-paths /workspaces/multi_hand_tracking_ws/src/ --ignore
 #Setup package for building
 RUN rm -r /workspaces/multi_hand_tracking_ws/build
 RUN rm -r /workspaces/multi_hand_tracking_ws/devel
+RUN /bin/bash -c '. /opt/ros/${ROS_DISTRO}/setup.bash; cd /workspaces/multi_hand_tracking_ws; catkin_make; source devel/setup.bash'
