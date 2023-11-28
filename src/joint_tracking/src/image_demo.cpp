@@ -29,14 +29,18 @@ void ImageCallback(const sensor_msgs::ImageConstPtr &image){
 int main(int argc, char **argv){
     ros::init(argc, argv, "image_demo");
     ros::NodeHandle nh("~");
-    ros::Subscriber image_sub = nh.subscribe("kinect2/qhd/image_color", 1, &ImageCallback);
+    ros::Subscriber image_sub = nh.subscribe("/kinect2/qhd/image_color", 1, &ImageCallback);
 
     ros::AsyncSpinner spinner(4);
     spinner.start();
 
     while(nh.ok()){
+        try {
         cv::imshow("Live Image", cv::imread("frame.jpg"));
         cv::waitKey(1);
+        } catch (){
+            ROS_ERROR("Failed to display image")
+        }
     }
 
     cv::destroyAllWindows();
