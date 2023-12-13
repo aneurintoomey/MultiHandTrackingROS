@@ -34,7 +34,7 @@ HandTracking::HandTracking(): nh("~"){
         if(client.call(srv)){
             ROS_INFO("Service Succesfully Called");
             ROS_INFO("Right Hand is a [%s] hand", srv.response.right.type.c_str());
-            cv::imshow("Live Image", cv_bridge::toCvShare(sensor_msgs::ImageConstPtr(new sensor_msgs::Image(srv.response.newImage)), sensor_msgs::image_encodings::RGB8)->image);
+            cv::imwrite("frame.jpg", cv_bridge::toCvShare(sensor_msgs::ImageConstPtr(new sensor_msgs::Image(srv.response.newImage)), sensor_msgs::image_encodings::RGB8)->image);
         } else {
             ROS_ERROR("Failed to Call Service");
         }
