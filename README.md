@@ -34,7 +34,7 @@ Once installation has completed any ROS project using the same ROS master can us
 
 [Docker](https://docs.docker.com/guides/get-started/)\
 [ROS 1 Melodic](https://wiki.ros.org/ROS/Tutorials)\
-[ROS w/Docker](https://wiki.ros.org/docker/Tutorials/Docker)\
+[ROS w/Docker](https://wiki.ros.org/docker/Tutorials/Docker)
 
 ## Author
 Aneurin Toomey\
