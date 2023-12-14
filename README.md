@@ -2,7 +2,7 @@
 
 ## Installation
 
-This project is built on a ROS1 Melodic Docker Image. As a result an installation of the docker engine is a requirement for use. Docker engine installation can be accomplished by installing "Docker Desktop" on Mac/Windows (https://www.docker.com/products/docker-desktop/) or by running `sudo apt install docker` on Ubuntu linux.
+This project is built on a ROS1 Melodic Docker Image. As a result an installation of the docker engine is a requirement for use. Docker engine installation can be accomplished by installing ["Docker Desktop"](https://www.docker.com/products/docker-desktop/) on Mac/Windows or by running `sudo apt install docker` on Ubuntu linux.
 
 Once the Docker Engine is properly installed the application should be built by running `sudo docker build -t dualhandtracking .` in the project's root directory. This will build the docker image allowing the service to be used on the host machine. To access the docker image run `sudo docker run --rm -it --net=host dualhandtracking` this will open a root user shell which can be used to run the service or the demos (note that when I state "within the docker image" I mean in the shell created by docker run).
 
